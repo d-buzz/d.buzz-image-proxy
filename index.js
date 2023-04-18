@@ -27,19 +27,33 @@ const isValidUrl = (url) => {
   }
 }
 
-const compressImage = async (buffer) => {
+async function isValidImage(imageBuffer) {
   try {
-    let quality = 90
-    let compressedImage = await sharp(buffer).jpeg({ quality }).toBuffer()
-
-    while (compressedImage.byteLength > 500 * 1024 && quality > 10) {
-      quality -= 5
-      compressedImage = await sharp(buffer).jpeg({ quality }).toBuffer()
-    }
-
-    return compressedImage
+    await sharp(imageBuffer).metadata()
+    return true
   } catch (error) {
-    console.error("Error compressing image:", error.message)
+    return false
+  }
+}
+
+const compressImage = async (buffer) => {
+  if (await isValidImage(buffer)) {
+    try {
+      let quality = 90
+      let compressedImage = await sharp(buffer).jpeg({ quality }).toBuffer()
+
+      while (compressedImage.byteLength > 500 * 1024 && quality > 10) {
+        quality -= 5
+        compressedImage = await sharp(buffer).jpeg({ quality }).toBuffer()
+      }
+
+      return compressedImage
+    } catch (error) {
+      console.error('Error compressing image:', error.message)
+      return buffer
+    }
+  } else {
+    console.error('Invalid image file. Skipping compression.')
     return buffer
   }
 }
