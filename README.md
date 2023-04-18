@@ -6,5 +6,5 @@
 ```bash
 > git clone https://github.com/d-buzz/d.buzz-image-proxy
 > yarn install
-> yarn start
+> node index.js
 ```
